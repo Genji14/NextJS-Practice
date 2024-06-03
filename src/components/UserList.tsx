@@ -9,9 +9,24 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogHeader,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import axios from 'axios'
@@ -21,15 +36,17 @@ import { Button } from './ui/button';
 import { EditUserForm } from './EditUserForm';
 import { User } from '@/types/interface';
 import { useUserContext } from '@/lib/context';
+import { ActiveYn } from '@/types/enum'
 
 const UserList = () => {
 
-    const { users, isLoading } = useUserContext();
+    const { users, setUsers, isLoading } = useUserContext();
 
     const handleDelete = async (username: string) => {
         try {
             await axios.delete(process.env.NEXT_PUBLIC_SERVER_URL! + "/users/" + username);
             toast.success("Delete user successfully !!!")
+            setUsers(users.filter(user => user.username !== username));
         } catch (ex) {
             console.error(ex);
         }
@@ -73,22 +90,46 @@ const UserList = () => {
                                                 </ul>
                                             </TableCell>
                                             <TableCell>
-                                                {user.activeYn === "Y" ? <CheckCircle className='text-lime-500 w-5 h-5' /> : <X className='text-destructive w-5 h-5' />}
+                                                {user.activeYn === ActiveYn.Y ? <CheckCircle className='text-lime-500 w-5 h-5' /> : <X className='text-destructive w-5 h-5' />}
                                             </TableCell>
                                             <TableCell className="w-40 flex gap-2">
                                                 <Dialog>
-                                                    <DialogTrigger>
+                                                    <DialogTrigger asChild>
                                                         <Button className="w-fit h-fit p-2">
                                                             <Edit2 className="w-4 h-4" />
                                                         </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent>
+                                                    <DialogContent className="gap-0">
+                                                        <DialogHeader>
+                                                            <span className="font-bold text-lg">
+                                                                Edit User
+                                                            </span>
+                                                        </DialogHeader>
+                                                        <DialogDescription>Change user information.</DialogDescription>
+                                                        <hr className="my-4 w-full h-[1px] bg-border" />
                                                         <EditUserForm user={user} />
                                                     </DialogContent>
                                                 </Dialog>
-                                                <Button onClick={() => handleDelete(user.username)} className="w-fit h-fit p-2" variant={"destructive"}>
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button className="w-fit h-fit p-2" variant={"destructive"}>
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete user
+                                                                and remove your data from our servers.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction className="bg-destructive/90 hover:bg-destructive" onClick={() => handleDelete(user.username)}>Delete</AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </TableCell>
                                         </TableRow>
                                     )

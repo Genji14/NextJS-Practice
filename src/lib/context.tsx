@@ -12,6 +12,7 @@ interface IUserContext {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     params: SearchParams;
     setParams: React.Dispatch<React.SetStateAction<SearchParams>>;
+    fetchUsers: (params?: SearchParams) => Promise<void>;
 }
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -42,7 +43,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     return (
-        <UserContext.Provider value={{ users, setUsers, isLoading, setIsLoading, params, setParams }}>
+        <UserContext.Provider value={{ users, setUsers, isLoading, setIsLoading, params, setParams, fetchUsers }}>
             {children}
         </UserContext.Provider>
     );
@@ -52,7 +53,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useUserContext = (): IUserContext => {
     const context = useContext(UserContext);
     if (!context) {
-        throw new Error('useUserContext phải được dùng trong UserProvider');
+        throw new Error('useUserContext must br use in UserProvider');
     }
     return context;
 };

@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
     Form,
     FormControl,
@@ -28,6 +27,9 @@ import axios from "axios"
 import { toast } from "sonner"
 import { User } from "@/types/interface"
 import { ActiveYn } from "@/types/enum"
+import { useUserContext } from "@/lib/context"
+import React, { useState } from "react"
+import { X } from "lucide-react"
 
 const projects = [
     {
@@ -65,8 +67,13 @@ const FormSchema = z.object({
 
 export function EditUserForm({ user }: { user: User }) {
 
+    const { params, fetchUsers } = useUserContext();
 
-    const form = useForm<User>({
+    const [proj, setProj] = useState<string>("");
+
+    const [isHidden, setIsHidden] = useState(true);
+
+    const updateForm = useForm<User>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             fullname: user.fullname,
@@ -77,13 +84,25 @@ export function EditUserForm({ user }: { user: User }) {
         },
     })
 
+
+    const handleDeleteProject = (name: string) => {
+        updateForm.setValue("projects", updateForm.getValues("projects").filter(proj => proj !== name));
+    }
+
+    const handleAddProject = (name: string) => {
+        if (name && !updateForm.getValues("projects").includes(name.toUpperCase())) {
+            updateForm.setValue("projects", [...updateForm.getValues("projects"), name.toUpperCase()]);
+        }
+    }
+
+
     async function onSubmit(data: User) {
-        const updateUser: User = { ...data, activeYn: data.activeYn ? ActiveYn.Y : ActiveYn.N };
         try {
-            const res = await axios.patch(process.env.NEXT_PUBLIC_SERVER_URL! + "/users/" + user.username, updateUser);
+            const res = await axios.patch(process.env.NEXT_PUBLIC_SERVER_URL! + "/users/" + user.username, data);
             console.log(res)
             if (res.status === 200) {
                 toast.success("Update User Successfully !!");
+                fetchUsers(params);
             }
         } catch (ex) {
             console.error(ex);
@@ -91,10 +110,10 @@ export function EditUserForm({ user }: { user: User }) {
     }
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="gap-4  flex flex-col">
+        <Form {...updateForm}>
+            <form onSubmit={updateForm.handleSubmit(onSubmit)} className="gap-4  flex flex-col">
                 <FormField
-                    control={form.control}
+                    control={updateForm.control}
                     name="username"
                     render={({ field }) => (
                         <FormItem>
@@ -107,7 +126,7 @@ export function EditUserForm({ user }: { user: User }) {
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={updateForm.control}
                     name="fullname"
                     render={({ field }) => (
                         <FormItem>
@@ -121,7 +140,7 @@ export function EditUserForm({ user }: { user: User }) {
                 />
 
                 <FormField
-                    control={form.control}
+                    control={updateForm.control}
                     name="role"
                     render={({ field }) => (
                         <FormItem>
@@ -145,14 +164,14 @@ export function EditUserForm({ user }: { user: User }) {
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={updateForm.control}
                     name="activeYn"
                     render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
                                 <FormLabel className="text-base">Active</FormLabel>
                                 <FormDescription>
-                                    Active status let user can login
+                                    Active status let user can login.
                                 </FormDescription>
                             </div>
                             <FormControl>
@@ -168,49 +187,31 @@ export function EditUserForm({ user }: { user: User }) {
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={updateForm.control}
                     name="projects"
                     render={() => (
-                        <FormItem>
-                            <div className="mb-4">
-                                <FormLabel className="text-base font-semibold">Projects</FormLabel>
-                                <FormDescription>
-                                    Select the projects.
-                                </FormDescription>
-                            </div>
+                        <FormItem className="my-2">
                             <div className="flex items-center gap-2">
-                                {projects.map((item) => (
-                                    <FormField
-                                        key={item.id}
-                                        control={form.control}
-                                        name="projects"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem
-                                                    key={item.id}
-                                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                                >
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value?.includes(item.id)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...field.value, item.id])
-                                                                    : field.onChange(
-                                                                        field.value?.filter(
-                                                                            (value) => value !== item.id
-                                                                        )
-                                                                    )
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">
-                                                        {item.label}
-                                                    </FormLabel>
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
+                                <Button variant="outline" type="button" onClick={() => setIsHidden(prev => !prev)}>Add Project</Button>
+                                {
+                                    !isHidden &&
+                                    <>
+                                        <Input value={proj} placeholder="Project Name" className="w-full" onChange={(evt) => setProj(evt.target.value)} />
+                                        <Button type="button" onClick={() => handleAddProject(proj)}>Add</Button>
+                                    </>
+                                }
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 my-2">
+                                {updateForm.getValues("projects").length > 0 && updateForm.getValues("projects").map((project, index: number) => (
+                                    <React.Fragment key={index}>
+                                        <span className="font-semibold text-xs">
+                                            {project}
+                                        </span>
+                                        <Button type="button" onClick={() => handleDeleteProject(project)} variant={"destructive"} className="w-fit h-fit p-1">
+                                            <X className="w-3 h-3" />
+                                        </Button>
+                                    </React.Fragment>
                                 ))}
                             </div>
                             <FormMessage />

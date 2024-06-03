@@ -13,4 +13,5 @@ export interface SearchParams {
     fullname?: string,
     role?: string,
     activeYn?: ActiveYn,
+    projects?: string[]
 }
