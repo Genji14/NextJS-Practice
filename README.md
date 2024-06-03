@@ -2,7 +2,18 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+
+Run The NextJS app first (port 3000) => Then run NestJS API Server (port 3001).
+
+Download dependencies:
+
+```bash
+
+yarn
+
+```
+
+Run the development server:
 
 ```bash
 
