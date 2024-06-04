@@ -33,10 +33,15 @@ import axios from 'axios'
 import { CheckCircle, Edit2, Loader2, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
-import { EditUserForm } from './EditUserForm';
 import { User } from '@/types/interface';
 import { useUserContext } from '@/lib/context';
 import { ActiveYn } from '@/types/enum'
+import dynamic from 'next/dynamic'
+
+
+const EditUserForm = dynamic(() => import('./EditUserForm'), {
+    loading: () => <p className='text-center'>Loading...</p>,
+})
 
 const UserList = () => {
 

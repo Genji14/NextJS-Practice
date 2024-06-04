@@ -31,22 +31,6 @@ import { useUserContext } from "@/lib/context"
 import React, { useState } from "react"
 import { X } from "lucide-react"
 
-const projects = [
-    {
-        id: "D&D",
-        label: "D&D",
-    },
-    {
-        id: "OPUS",
-        label: "OPUS",
-    },
-    {
-        id: "Tiger",
-        label: "Tiger",
-    },
-] as const
-
-
 const FormSchema = z.object({
     fullname: z.string().min(1, {
         message: "Full name is required"
@@ -65,7 +49,7 @@ const FormSchema = z.object({
     }),
 })
 
-export function EditUserForm({ user }: { user: User }) {
+const EditUserForm = ({ user }: { user: User }) => {
 
     const { params, fetchUsers } = useUserContext();
 
@@ -92,14 +76,13 @@ export function EditUserForm({ user }: { user: User }) {
     const handleAddProject = (name: string) => {
         if (name && !updateForm.getValues("projects").includes(name.toUpperCase())) {
             updateForm.setValue("projects", [...updateForm.getValues("projects"), name.toUpperCase()]);
+            setProj("");
         }
     }
-
 
     async function onSubmit(data: User) {
         try {
             const res = await axios.patch(process.env.NEXT_PUBLIC_SERVER_URL! + "/users/" + user.username, data);
-            console.log(res)
             if (res.status === 200) {
                 toast.success("Update User Successfully !!");
                 fetchUsers(params);
@@ -223,3 +206,5 @@ export function EditUserForm({ user }: { user: User }) {
         </Form>
     )
 }
+
+export default EditUserForm;

@@ -42,6 +42,7 @@ const SearchToolbar = () => {
                 query.toUpperCase()
             ]
         }));
+        setProjectQuery('');
     }
 
 

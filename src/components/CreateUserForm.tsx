@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
     Form,
     FormControl,
@@ -51,7 +50,7 @@ const FormSchema = z.object({
 })
 
 
-export function CreateUserForm() {
+const CreateUserForm = () => {
 
     const [proj, setProj] = useState<string>("");
 
@@ -89,6 +88,7 @@ export function CreateUserForm() {
     const handleAddProject = (name: string) => {
         if (name && !createForm.getValues("projects").includes(name.toUpperCase())) {
             createForm.setValue("projects", [...createForm.getValues("projects"), name.toUpperCase()]);
+            setProj("");
         }
     }
 
@@ -207,3 +207,6 @@ export function CreateUserForm() {
         </Form>
     )
 }
+
+
+export default CreateUserForm;
