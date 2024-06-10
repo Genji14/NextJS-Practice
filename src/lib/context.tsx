@@ -17,8 +17,8 @@ interface IUserContext {
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [users, setUsers] = useState<User[]>([]);
+export const UserProvider: React.FC<{ children: ReactNode, initialUsers: User[] }> = ({ children, initialUsers }) => {
+    const [users, setUsers] = useState<User[]>(initialUsers);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [params, setParams] = useState<SearchParams>({});
 

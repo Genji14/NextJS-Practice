@@ -30,6 +30,7 @@ import { ActiveYn } from "@/types/enum"
 import { useUserContext } from "@/lib/context"
 import React, { useState } from "react"
 import { X } from "lucide-react"
+import { Table } from "@tanstack/react-table"
 
 const FormSchema = z.object({
     fullname: z.string().min(1, {
@@ -49,7 +50,7 @@ const FormSchema = z.object({
     }),
 })
 
-const EditUserForm = ({ user }: { user: User }) => {
+const EditUserForm = ({ user, table }: { user: User, table: Table<User> }) => {
 
     const { params, fetchUsers } = useUserContext();
 
@@ -86,6 +87,7 @@ const EditUserForm = ({ user }: { user: User }) => {
             if (res.status === 200) {
                 toast.success("Update User Successfully !!");
                 fetchUsers(params);
+                table.setPageIndex(0);
             }
         } catch (ex) {
             console.error(ex);

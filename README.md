@@ -1,5 +1,34 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## How to run application
+
+*Caution: Please make sure you had run the NestJS Server.
+
+### Go to project folder
+
+```bash
+cd nextjs-practice
+```
+
+### Install Dependencies Package
+
+```bash
+yarn
+#or
+npm install
+
+```
+
+### Run project
+
+```bash
+yarn dev
+#or
+npm run dev
+```
+
+The application will be run in [Application](http://localhost:3000/)
+
 ## Feature 
 
 ### User Management Dashboard

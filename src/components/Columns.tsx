@@ -19,12 +19,13 @@ import {
     DialogHeader,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { useUserContext } from "@/lib/context"
 import { ActiveYn } from "@/types/enum"
 
 import { User } from "@/types/interface"
 import { ColumnDef } from "@tanstack/react-table"
 import axios from "axios"
-import { CheckCircle, Edit2, Trash2, X } from "lucide-react"
+import { ArrowUpDown, CheckCircle, Edit2, Trash2, X } from "lucide-react"
 import { toast } from "sonner"
 
 export const columns: ColumnDef<User>[] = [
@@ -34,7 +35,17 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: "fullname",
-        header: "Full name",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Full name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        }
     },
     {
         accessorKey: "role",
@@ -69,13 +80,16 @@ export const columns: ColumnDef<User>[] = [
     {
         id: "actions",
         header: "Actions",
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
             const user = row.original;
+            const { users, setUsers } = useUserContext();
+
             const handleDelete = async (username: string) => {
                 try {
                     await axios.delete(process.env.NEXT_PUBLIC_SERVER_URL! + "/users/" + username);
                     toast.success("Delete user successfully !!!")
-                    // setUsers(users.filter(user => user.username !== username));
+                    setUsers(users.filter(user => user.username !== username));
+                    table.setPageIndex(0);
                 } catch (ex) {
                     console.error(ex);
                 }
@@ -96,7 +110,7 @@ export const columns: ColumnDef<User>[] = [
                             </DialogHeader>
                             <DialogDescription>Change user information.</DialogDescription>
                             <hr className="my-4 w-full h-[1px] bg-border" />
-                            <EditUserForm user={user} />
+                            <EditUserForm user={user} table={table} />
                         </DialogContent>
                     </Dialog>
                     <AlertDialog>
